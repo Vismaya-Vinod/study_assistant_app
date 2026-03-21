@@ -1,0 +1,50 @@
+import streamlit as st
+from utils.gemini_helper import generate_response
+from core.ai_utils import get_visuals_instruction
+
+def summarize_text(text: str, previous_context: str = "", user_focus: str = "", extra_instruction: str = "") -> str:
+    """
+    Summarize study materials, aligning output for exam preparation if requested.
+    Optionally includes instructions for text-based visuals if enabled in sidebar.
+
+    Notes:
+    - Keeps backwards compatibility with existing callers that pass `previous_context` or `user_focus`.
+    - `extra_instruction` (preferred) or `user_focus` will be used to adapt the output.
+    """
+    # Short-text guard
+    clean_text = (text or "").strip()
+    if len(clean_text) < 100:
+        return (
+            "⚠️ The extracted text is very short. "
+            "This often happens with scanned/image-based PDFs or empty pages. "
+            "Please try another file or copy-paste the content directly."
+        )
+
+    # Prefer extra_instruction, fall back to user_focus (keeps compatibility)
+    instruction = extra_instruction.strip() if extra_instruction else user_focus.strip()
+
+    visuals_block = ""
+    if st.session_state.get("include_visuals", True):
+        visuals_block = "\n" + get_visuals_instruction()
+
+    prompt = f"""
+You are Study Buddy, an academic summary AI.
+
+- If text is VERY short (<50 words), say: "This text is too short to summarize. Please provide longer content."
+- Otherwise, create a compact, exam-ready summary in clear, bullet-point sections:
+  - Core definitions
+  - Most important points (bullets)
+  - Key formulas or diagrams (if present)
+  - Application scenarios or examples
+  - Add 2-3 practice/follow-up questions based on the content
+
+If the user gives extra instructions (below), adapt output accordingly (e.g., "focus on applications"):
+{instruction}
+
+Reference prior chat context if relevant:
+{previous_context}{visuals_block}
+
+Content:
+{text}
+"""
+    return generate_response(prompt.strip())
