@@ -3,11 +3,17 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 
+import streamlit as st
+
+st.write(st.secrets)   # 👈 ADD THIS LINE
+
+# rest of your code...
+
 # Load local .env (for development)
 load_dotenv()
 
 # Try local first, then Streamlit secrets
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY")
+GEMINI_API_KEY =st.secrets.get("GEMINI_API_KEY")
 
 api_configured = False
 _config_error = ""
