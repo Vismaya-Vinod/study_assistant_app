@@ -1,10 +1,13 @@
 import google.generativeai as genai
+import streamlit as st
 import os
 from dotenv import load_dotenv
 
-# Load local .env for development (won't affect deployed env vars)
+# Load local .env (for development)
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Try local first, then Streamlit secrets
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY")
 
 api_configured = False
 _config_error = ""
@@ -17,7 +20,7 @@ if GEMINI_API_KEY:
         _config_error = str(e)
         api_configured = False
 else:
-    _config_error = "GEMINI_API_KEY not set in environment."
+    _config_error = "GEMINI_API_KEY not set."
 
 MODEL = "models/gemini-2.5-flash"
 
