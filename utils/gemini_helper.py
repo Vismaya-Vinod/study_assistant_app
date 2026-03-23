@@ -3,9 +3,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 
-import streamlit as st
 
-st.write(st.secrets)   # 👈 ADD THIS LINE
 
 # rest of your code...
 
