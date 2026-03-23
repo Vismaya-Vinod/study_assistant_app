@@ -98,19 +98,24 @@ def login_ui():
             user_data = load_user_data(email)
 
             if user_data["password"] == password:
+
+                # 🔥 CLEAR SESSION (correct place)
+                for key in list(st.session_state.keys()):
+                    del st.session_state[key]
+
+                # ✅ Now set fresh session
                 st.session_state.logged_in = True
                 st.session_state.current_user = email
 
-                # ---- Reset only transient session variables ----
-                st.session_state.pdf_content = None  # Clear any previous PDF text
-                st.session_state.questions = ""      # Clear previous generated questions
+                st.session_state.pdf_content = None
+                st.session_state.questions = ""
 
-                # ---- Load persistent user data ----
                 st.session_state.user_data = user_data
                 st.session_state.exams = user_data.get("exams", {})
 
                 st.success("✅ Logged in!")
                 st.rerun()
+
             else:
                 st.error("❌ Wrong password")
         else:
